@@ -1,4 +1,5 @@
 from patterns.csv_utils import Ride
+from patterns import strategy_report_data_row
 
 def create_content(rides):
     builder = [_create_headers("Taxi Report"), _create_table_headers()]
@@ -37,19 +38,8 @@ def _close_table_headers():
 
 
 def _add_ride(ride):
-    return "".join([
-        "<tr>",
-        f"<td>{ride.taxi_id}</td>",
-        f"<td>{ride.pick_up_time.isoformat()}</td>",
-        f"<td>{ride.drop_of_time.isoformat()}</td>",
-        f"<td>{ride.passenger_count}</td>",
-        f"<td>{ride.trip_distance}</td>",
-        f"<td>{_format_amount(ride.tolls_amount)}</td>",
-        "</tr>"
-    ])
+    row_strategy = strategy_report_data_row.HtmlRow()
 
+    row_strategy = strategy_report_data_row.RowGenerator(row_strategy, ride)
 
-def _format_amount(amount):
-    if amount < 0:
-        return f"<span style='color:red'>{amount}</span>"
-    return str(amount)
+    return row_strategy.run_formatting()
